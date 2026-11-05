@@ -1,0 +1,79 @@
+# 04 - Test Plan and Verification
+
+Each test lists the action, expected result and the evidence file to capture from the **real device**. Save screenshots in [`evidence/screenshots/`](../evidence/screenshots/) using the filenames shown. Mark the result column as you go.
+
+> Expected outputs below are representative; values such as uptime, MAC addresses and counters will differ on your device.
+
+| ID | Test | Action | Expected result | Evidence file | Result |
+|----|------|--------|-----------------|---------------|--------|
+| T01 | Console access | Open serial session from PC-A | Switch prompt appears; login required | `T01-console.png` | ☐ |
+| T02 | VLANs | `show vlan brief` | VLANs 10, 20, 99, 999 with correct port membership | `T02-vlans.png` | ☐ |
+| T03 | Port status | `show interfaces status` | Fa0/1 and Fa0/25 `connected`; Fa0/45-48 and Gi0/1-2 `disabled` | `T03-int-status.png` | ☐ |
+| T04 | DHCP, staff | PC-A: `ipconfig /renew` | 192.168.10.x, GW 192.168.10.1 | `T04-pca-ipconfig.png` | ☐ |
+| T05 | DHCP, guest | PC-B: `ipconfig /renew` | 192.168.20.x, GW 192.168.20.1 | `T05-pcb-ipconfig.png` | ☐ |
+| T06 | Gateway reachability | PC-A ping 192.168.10.1; PC-B ping 192.168.20.1 | Replies | `T06-gateway-ping.png` | ☐ |
+| T07 | Guest isolation | PC-B ping PC-A and 192.168.10.1 | Request timed out / unreachable | `T07-guest-blocked.png` | ☐ |
+| T08 | ACL hit counters | `show access-lists GUEST-IN` | Match counters increase on deny lines | `T08-acl-hits.png` | ☐ |
+| T09 | SSH from staff | PC-A: `ssh netadmin@192.168.99.1` | Banner and login prompt | `T09-ssh-pca.png` | ☐ |
+| T10 | SSH from guest | PC-B: `ssh netadmin@192.168.20.1` | Connection refused / times out | `T10-ssh-pcb-denied.png` | ☐ |
+| T11 | Telnet disabled | PC-A: `telnet 192.168.99.1` | Connection fails | `T11-telnet-fail.png` | ☐ |
+| T12 | Port security | `show port-security interface fa0/1` | Max 1, sticky MAC learned, violations 0 | `T12-portsec.png` | ☐ |
+| T13 | Port-security violation | Move PC-B cable to Fa0/1 | Fa0/1 goes `err-disabled`, log message `PORT_SECURITY-2-PSECURE_VIOLATION` | `T13-violation.png` | ☐ |
+| T14 | Errdisable recovery | `show errdisable recovery`; wait or `shutdown` / `no shutdown` | Port recovers after timer or manual bounce | `T14-recovery.png` | ☐ |
+| T15 | BPDU guard | Patch cable between Fa0/2 and Fa0/3 | Port err-disabled, `SPANTREE-2-BLOCK_BPDUGUARD` log | `T15-bpduguard.png` | ☐ |
+| T16 | DHCP snooping | `show ip dhcp snooping binding` | Entries for PC-A (VLAN 10) and PC-B (VLAN 20) | `T16-snooping-binding.png` | ☐ |
+| T17 | Dynamic ARP Inspection | Set PC-B static IP 192.168.20.50, ping gateway | Dropped; `show ip arp inspection` drop counter increases | `T17-dai.png` | ☐ |
+| T18 | Unused port | Connect PC to Fa0/46 | No link (port shutdown) | `T18-unused-port.png` | ☐ |
+| T19 | Config saved | `show startup-config` | Matches running config | `T19-saved.png` | ☐ |
+
+## Key verification commands
+
+```
+show version
+show vlan brief
+show interfaces status
+show ip interface brief
+show ip route
+show ip dhcp binding
+show ip dhcp snooping
+show ip dhcp snooping binding
+show ip arp inspection vlan 10,20
+show port-security
+show port-security interface fa0/1
+show errdisable recovery
+show spanning-tree summary
+show access-lists
+show ip ssh
+show users
+show logging
+```
+
+## Representative expected output
+
+`show vlan brief` (trimmed)
+
+```
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active
+10   STAFF                            active    Fa0/1, Fa0/2, ... Fa0/24
+20   GUEST                            active    Fa0/25, Fa0/26, ... Fa0/40
+99   MANAGEMENT                       active    Fa0/41, Fa0/42, Fa0/43, Fa0/44
+999  BLACKHOLE                        active    Fa0/45, Fa0/46, Fa0/47, Fa0/48, Gi0/1, Gi0/2
+```
+
+`show ip dhcp snooping binding` (representative)
+
+```
+MacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface
+------------------  ---------------  ----------  -------------  ----  --------------------
+AA:BB:CC:00:00:01   192.168.10.21    86300       dhcp-snooping  10    FastEthernet0/1
+AA:BB:CC:00:00:02   192.168.20.21    28700       dhcp-snooping  20    FastEthernet0/25
+```
+
+Port-security violation log (representative)
+
+```
+%PM-4-ERR_DISABLE: psecure-violation error detected on Fa0/1, putting Fa0/1 in err-disable state
+%PORT_SECURITY-2-PSECURE_VIOLATION: Security violation occurred, caused by MAC address aabb.cc00.0002 on port FastEthernet0/1.
+```
