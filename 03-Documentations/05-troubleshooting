@@ -1,0 +1,32 @@
+# 05 - Troubleshooting Guide
+
+Common problems for this design, their cause and the fix.
+
+| # | Symptom | Likely cause | Fix |
+|---|---------|--------------|-----|
+| 1 | PC gets `169.254.x.x` | DHCP snooping Option 82 inserted while the switch is also the DHCP server | `no ip dhcp snooping information option`, then `ipconfig /renew` |
+| 2 | PC gets `169.254.x.x` | Port in wrong VLAN, or DHCP pool excluded range covers the whole pool | `show vlan brief`, `show ip dhcp pool` |
+| 3 | `switchport access vlan 999` rejected or warning | VLAN not created yet | Create VLANs before applying port configuration |
+| 4 | SSH: `No hostname or domain` / key error | Missing `ip domain-name` or RSA key | Set hostname + domain, run `crypto key generate rsa modulus 2048` |
+| 5 | SSH rejected from PC-A | Source not in `MGMT-ACCESS`, or Vlan99 SVI down | `show access-lists MGMT-ACCESS`, `show ip interface brief` |
+| 6 | Vlan99 is `down/down` | No active port in VLAN 99 and `no autostate` unsupported on this IOS | Use `no autostate`, or connect a device to Fa0/41-44 |
+| 7 | Port is `err-disabled` | Port security, BPDU guard or DHCP rate limit violation | `show interfaces status err-disabled`, fix cause, then `shutdown` / `no shutdown` |
+| 8 | Moved PC to another port and it is blocked | Sticky MAC on the old port, or new port has a different sticky MAC | `clear port-security sticky interface fa0/X` and bounce port |
+| 9 | Host with static IP cannot communicate | DAI drops ARP because no binding exists | Use DHCP or create an ARP ACL for static hosts |
+| 10 | Guest can ping its gateway but nothing else | Expected: `GUEST-IN` blocks internal ranges | Confirm with `show access-lists GUEST-IN` counters |
+| 11 | Staff cannot reach guest | Expected: guest replies are dropped by the inbound ACL | By design (see design document, section 8) |
+| 12 | Console shows garbage | Wrong baud or flow control | 9600 8N1, flow control None |
+| 13 | Locked out after login attempts | `login block-for` quiet period active | Wait 120 s, or use the console |
+| 14 | Cannot log in on console after config | `login local` set but no local user | Create user with `username netadmin ... secret ...` first |
+
+## Handy diagnostic commands
+
+```
+show interfaces status err-disabled
+show ip dhcp conflict
+show ip dhcp server statistics
+debug ip dhcp server events      ! disable with "undebug all"
+show ip arp inspection statistics
+show spanning-tree vlan 10
+show logging | include PORT_SECURITY|BPDU|DHCP|ARP
+```
