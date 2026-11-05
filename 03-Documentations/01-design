@@ -1,0 +1,91 @@
+# 01 - Network Design
+
+## 1. Business scenario
+
+A small branch office needs a single access switch that safely serves **staff** and **guest** users, is manageable only by an administrator, and is hardened against common Layer 2 attacks (rogue DHCP, ARP spoofing, MAC flooding, unauthorised devices, accidental loops).
+
+## 2. Requirements
+
+| ID | Requirement |
+|----|-------------|
+| R1 | Separate staff and guest traffic into different VLANs |
+| R2 | Provide automatic addressing (DHCP) for both user networks |
+| R3 | Route between VLANs on the switch, with guests isolated from internal networks |
+| R4 | Management only via SSHv2 from approved subnets; console for out-of-band access |
+| R5 | Only one known device per access port; violations must be contained |
+| R6 | Protect against rogue DHCP servers, ARP spoofing and accidental switching loops |
+| R7 | Disable all unused ports |
+| R8 | Fully documented, reproducible and tested |
+
+## 3. Equipment
+
+| Item | Qty | Notes |
+|------|-----|-------|
+| Cisco Catalyst 3560, 48 x 10/100 + 2 x Gigabit | 1 | Hostname `BR1-SW01`. IOS image: `<fill in from show version>` |
+| PC-A (Windows) | 1 | Console client (terminal emulator) **and** staff host on Fa0/1 |
+| PC-B (Windows) | 1 | Guest host on Fa0/25 |
+| USB-to-RJ45 console (rollover) cable | 1 | PC-A to switch console port |
+| Cat5e/Cat6 patch cables | 2 | PC-A to Fa0/1, PC-B to Fa0/25 |
+
+## 4. Topology
+
+**Physical**
+
+![Physical topology](../diagrams/physical-topology.svg)
+
+**Logical**
+
+![Logical topology](../diagrams/logical-topology.svg)
+
+## 5. VLAN plan
+
+| VLAN | Name | Subnet | Gateway (SVI) | Addressing | Purpose |
+|------|------|--------|---------------|------------|---------|
+| 10 | STAFF | 192.168.10.0/24 | 192.168.10.1 | DHCP .21-.254 | Trusted internal users |
+| 20 | GUEST | 192.168.20.0/24 | 192.168.20.1 | DHCP .21-.254 | Untrusted users, isolated |
+| 99 | MANAGEMENT | 192.168.99.0/24 | 192.168.99.1 | Static | Network device management |
+| 999 | BLACKHOLE | none | none | none | Parking VLAN for unused ports |
+
+DHCP excludes `.1-.20` in each user subnet so the range stays free for static infrastructure.
+
+## 6. Port map
+
+| Ports | VLAN | Role | Security |
+|-------|------|------|----------|
+| Fa0/1 - 24 | 10 | Staff access | Port security, PortFast, BPDU guard, storm control, DHCP snooping rate limit |
+| Fa0/25 - 40 | 20 | Guest access | Same as staff |
+| Fa0/41 - 44 | 99 | Management (reserved) | Port security, PortFast, BPDU guard |
+| Fa0/45 - 48, Gi0/1 - 2 | 999 | Unused | Shutdown, parked in blackhole VLAN |
+| Console | - | Out-of-band | `login local`, 10 min timeout |
+
+| Host | Port | Expected address (DHCP) |
+|------|------|-------------------------|
+| PC-A | Fa0/1 | 192.168.10.21 (first free lease) |
+| PC-B | Fa0/25 | 192.168.20.21 (first free lease) |
+
+## 7. Security controls and rationale
+
+| Control | Configuration | Threat mitigated |
+|---------|---------------|------------------|
+| VLAN segmentation | VLAN 10 / 20 / 99 | Lateral movement between user groups |
+| Blackhole VLAN + shutdown | VLAN 999, unused ports `shutdown` | Unauthorised physical connection |
+| Disable DTP | `switchport nonegotiate`, static access mode | VLAN hopping via trunk negotiation |
+| Port security (sticky, max 1, shutdown) | Access ports | MAC flooding, device swapping |
+| PortFast + BPDU guard | Access ports | Rogue switches, accidental loops |
+| DHCP snooping + rate limit | VLAN 10, 20 | Rogue DHCP servers, DHCP starvation |
+| Dynamic ARP Inspection | VLAN 10, 20 | ARP spoofing / poisoning |
+| Storm control | Broadcast 20% on access ports | Broadcast storms |
+| Guest ACL | `GUEST-IN` inbound on Vlan20 | Guest access to internal networks |
+| SSH-only, ACL-restricted VTY | `MGMT-ACCESS`, `transport input ssh` | Unauthorised / cleartext management |
+| Login throttling | `login block-for 120 attempts 3 within 60` | Brute-force logins |
+| Errdisable auto-recovery | 300 s interval | Reduces admin overhead after violations |
+| HTTP server disabled, banner, timeouts, encrypted passwords | Global / lines | Reduced attack surface |
+| Root bridge priority 4096 | VLANs 10, 20, 99 | Deterministic STP root (future-proofs adding switches) |
+
+## 8. Design decisions and limitations
+
+- **Switch is the DHCP server.** DHCP snooping Option 82 insertion is disabled for this reason (see troubleshooting guide).
+- **DAI relies on the snooping binding table**, so hosts must use DHCP. Static hosts would need ARP ACLs.
+- **Return traffic is blocked** for guest to staff flows because the ACL is applied inbound on Vlan20 without stateful tracking; a Layer 3 switch has no stateful firewall. Guest isolation is therefore effectively bidirectional.
+- **Vlan99 uses `no autostate`** so the management SVI stays up with no host in VLAN 99. If your IOS version rejects the command, the SVI comes up once a device is connected to Fa0/41-44.
+- **No uplink**: Gi0/1-2 are shut down. A second switch or router would be required for STP topology changes, trunking and EtherChannel (see future work in the README).
