@@ -1,8 +1,4 @@
-# 04 - Test Plan and Verification
-
-Each test lists the action, expected result and the evidence file to capture from the **real device**. Save screenshots in [`evidence/screenshots/`](../evidence/screenshots/) using the filenames shown. Mark the result column as you go.
-
-> Expected outputs below are representative; values such as uptime, MAC addresses and counters will differ on your device.
+04 - Test Plan and Verification
 
 | ID | Test | Action | Expected result | Evidence file | Result |
 |----|------|--------|-----------------|---------------|--------|
@@ -26,7 +22,7 @@ Each test lists the action, expected result and the evidence file to capture fro
 | T18 | Unused port | Connect PC to Fa0/46 | No link (port shutdown) | `T18-unused-port.png` | ☐ |
 | T19 | Config saved | `show startup-config` | Matches running config | `T19-saved.png` | ☐ |
 
-## Key verification commands
+Key verification commands
 
 ```
 show version
@@ -48,7 +44,7 @@ show users
 show logging
 ```
 
-## Representative expected output
+Representative expected output
 
 `show vlan brief` (trimmed)
 
