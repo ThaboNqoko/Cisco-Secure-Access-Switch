@@ -24,10 +24,11 @@ Objectives
 6. Document, test and evidence everything.
 
 Logical design
+
 <img width="1536" height="1024" alt="Branch Office Secure Network Topology" src="https://github.com/user-attachments/assets/63661882-f836-4356-aa98-8f16c5a493ff" />
 
 
-![Logical topology](diagrams/logical-topology.svg)
+
 
 | VLAN | Name | Subnet | Gateway | Ports |
 |------|------|--------|---------|-------|
