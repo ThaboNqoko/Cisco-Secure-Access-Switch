@@ -87,26 +87,14 @@ Repository structure
     └── screenshots/
 ```
 
- Quick start
-
-1. Connect PC-A to the console port (9600 8N1) and clear the switch (`write erase`, `delete flash:vlan.dat`, `reload`).
-2. Open [`configs/BR1-SW01.cfg`](configs/BR1-SW01.cfg), replace the `CHANGE_ME_*` secrets and paste it in global configuration mode.
-3. Run `crypto key generate rsa modulus 2048`.
-4. Connect PC-A to `Fa0/1` and PC-B to `Fa0/25`, both set to DHCP.
-5. Work through the [test plan](docs/04-test-plan.md).
-
-## Skills demonstrated
-
-VLAN design | Inter-VLAN routing | DHCP | Rapid-PVST+ | Port security | DHCP snooping | Dynamic ARP Inspection | BPDU guard | ACLs | SSH hardening | Network documentation | Troubleshooting methodology | Cisco IOS CLI
-
-## Future improvements
+Future improvements
 
 - Add a second switch to introduce 802.1Q trunking, EtherChannel and real STP convergence.
 - Add a router or firewall uplink for NAT and internet access, plus a stateful guest policy.
 - Centralise logging with a syslog server and add NTP.
 - Replace local accounts with AAA (RADIUS/TACACS+) and add 802.1X.
 
-## Author
+Author
 
 **Thabo Nqoko** - Network Engineer (Level 0), Durban, South Africa
 [LinkedIn](https://linkedin.com/in/thabo-nqoko-a7403a442) | [Portfolio](https://thabonqoko.github.io) | [GitHub](https://github.com/1of1Thabo)
