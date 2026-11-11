@@ -2,7 +2,7 @@
 
 1. Business scenario
 
-A small branch office needs a single access switch that safely serves **staff** and **guest** users, is manageable only by an administrator, and is hardened against common Layer 2 attacks (rogue DHCP, ARP spoofing, MAC flooding, unauthorised devices, accidental loops).
+A small branch office needs a single access switch that safely serves staff and guest users, is manageable only by an administrator, and is hardened against common Layer 2 attacks (rogue DHCP, ARP spoofing, MAC flooding, unauthorised devices, accidental loops).
 
  2. Requirements
 
