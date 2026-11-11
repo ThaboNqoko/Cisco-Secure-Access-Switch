@@ -1,4 +1,4 @@
-# 05 - Troubleshooting Guide
+05 - Troubleshooting Guide
 
 Common problems for this design, their cause and the fix.
 
@@ -19,7 +19,7 @@ Common problems for this design, their cause and the fix.
 | 13 | Locked out after login attempts | `login block-for` quiet period active | Wait 120 s, or use the console |
 | 14 | Cannot log in on console after config | `login local` set but no local user | Create user with `username netadmin ... secret ...` first |
 
-## Handy diagnostic commands
+ Handy diagnostic commands
 
 ```
 show interfaces status err-disabled
