@@ -193,8 +193,6 @@ Add the MOTD banner, logging settings and remaining service hardening from the c
 
 1. Connect **PC-A** to `Fa0/1` and **PC-B** to `Fa0/25` (see [PC setup](03-pc-setup.md)).
 2. Save: `copy running-config startup-config`
-3. Back up the sanitised config to the repo (see "Sanitising" below).
+3. Back up the sanitised config to the repo.
 
-### Sanitising a config before committing
 
-Do **not** commit a raw `show running-config`. It contains secret hashes, sticky MAC addresses and your real device identifiers. Replace those with placeholders (`CHANGE_ME_*`) and remove the `switchport port-security mac-address sticky <mac>` lines before pushing.
