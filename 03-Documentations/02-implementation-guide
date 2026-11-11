@@ -1,8 +1,8 @@
-# 02 - Implementation Guide
+02 - Implementation Guide
 
 Follow the phases in order. The complete finished configuration is in [`configs/BR1-SW01.cfg`](../configs/BR1-SW01.cfg); this guide shows how it is built and verified step by step.
 
-## Phase 0 - Console access and factory reset
+Phase 0 - Console access and factory reset
 
 1. Connect the USB-to-RJ45 console cable from **PC-A** to the switch console port.
 2. Open Device Manager, note the COM port (e.g. `COM3`).
@@ -25,7 +25,7 @@ Switch# show version
 Switch# show inventory
 ```
 
-## Phase 1 - Base device configuration
+Phase 1 - Base device configuration
 
 ```
 Switch> enable
@@ -41,7 +41,7 @@ BR1-SW01(config)# login block-for 120 attempts 3 within 60
 BR1-SW01(config)# vtp mode transparent
 ```
 
-## Phase 2 - VLANs, STP and errdisable recovery
+Phase 2 - VLANs, STP and errdisable recovery
 
 ```
 BR1-SW01(config)# vlan 10
@@ -66,7 +66,7 @@ BR1-SW01(config)# errdisable recovery interval 300
 
 Verify: `show vlan brief`, `show spanning-tree summary`.
 
-## Phase 3 - Layer 3 gateways and DHCP server
+Phase 3 - Layer 3 gateways and DHCP server
 
 ```
 BR1-SW01(config)# ip routing
@@ -97,7 +97,7 @@ BR1-SW01(dhcp-config)# lease 0 8
 BR1-SW01(dhcp-config)# exit
 ```
 
-## Phase 4 - Access, management and unused ports
+ Phase 4 - Access, management and unused ports
 
 Apply the four `interface range` blocks from the config file:
 
@@ -128,7 +128,7 @@ BR1-SW01(config-if-range)# no cdp enable
 
 Verify: `show interfaces status`, `show port-security`, `show running-config interface Fa0/1`.
 
-## Phase 5 - DHCP snooping and Dynamic ARP Inspection
+ Phase 5 - DHCP snooping and Dynamic ARP Inspection
 
 ```
 BR1-SW01(config)# no ip dhcp snooping information option
@@ -143,7 +143,7 @@ Per-port rate limit (inside the access `interface range` blocks): `ip dhcp snoop
 
 Verify: `show ip dhcp snooping`, `show ip dhcp snooping binding`, `show ip arp inspection vlan 10,20`.
 
-## Phase 6 - ACLs and management plane hardening
+Phase 6 - ACLs and management plane hardening
 
 ```
 BR1-SW01(config)# ip access-list standard MGMT-ACCESS
@@ -189,7 +189,7 @@ BR1-SW01(config-line)# exit
 
 Add the MOTD banner, logging settings and remaining service hardening from the config file.
 
-## Phase 7 - Connect hosts, save and back up
+ Phase 7 - Connect hosts, save and back up
 
 1. Connect **PC-A** to `Fa0/1` and **PC-B** to `Fa0/25` (see [PC setup](03-pc-setup.md)).
 2. Save: `copy running-config startup-config`
