@@ -1,6 +1,6 @@
-# 03 - PC Setup
+ 03 - PC Setup
 
-## PC-A (admin / staff host + console client)
+ PC-A (admin / staff host + console client)
 
 | Item | Setting |
 |------|---------|
@@ -11,7 +11,7 @@
 | NIC addressing | Obtain IP address automatically (DHCP) |
 | Expected lease | 192.168.10.21/24, gateway 192.168.10.1 |
 
-## PC-B (guest host)
+PC-B (guest host)
 
 | Item | Setting |
 |------|---------|
@@ -20,7 +20,7 @@
 | NIC addressing | Obtain IP address automatically (DHCP) |
 | Expected lease | 192.168.20.21/24, gateway 192.168.20.1 |
 
-## Useful Windows commands
+Useful Windows commands
 
 ```
 ipconfig /release
@@ -38,6 +38,4 @@ Run PuTTY SSH from PC-A with:
 ssh netadmin@192.168.99.1
 ```
 
-If Windows has the OpenSSH client enabled, the command above also works from Command Prompt.
 
-> Tip: disable other network adapters (Wi-Fi) on both PCs while testing so traffic and DHCP leases only use the lab NIC.
