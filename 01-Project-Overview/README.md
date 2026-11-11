@@ -15,7 +15,7 @@ A hands-on network engineering project that builds and hardens a single **48-por
 | **Device** | Cisco Catalyst 3560, 48 x 10/100 + 2 x Gigabit (`BR1-SW01`) |
 | **Hosts** | PC-A (console client + staff host), PC-B (guest host) |
 | **Focus** | Segmentation, Layer 2 security, secure management, documentation |
-| **Config** | [`configs/BR1-SW01.cfg`](configs/BR1-SW01.cfg) (sanitised, secrets are placeholders) |
+| **Config** | [`configs/BR1-SW01.cfg`](configs/BR1-SW01.cfg) |
 
 Objectives
 
