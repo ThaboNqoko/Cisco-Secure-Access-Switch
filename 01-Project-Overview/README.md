@@ -24,6 +24,7 @@ Objectives
 6. Document, test and evidence everything.
 
 Logical design
+![Uploading image.png…]()
 
 ![Logical topology](diagrams/logical-topology.svg)
 
