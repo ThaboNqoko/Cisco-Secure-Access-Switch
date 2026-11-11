@@ -2,7 +2,8 @@ Cisco-: Secure Access Switch Baseline - Cisco Catalyst 3560 (48-port)
 
 A hands-on network engineering project that builds and hardens a single **48-port Cisco Catalyst access switch** for a small branch office, using one console/admin PC and one guest PC. It covers VLAN segmentation, inter-VLAN routing, a DHCP server, Layer 2 security features, ACL-based guest isolation, and a hardened management plane, backed by a full test plan.
 
-![Physical topology](diagrams/physical-topology.svg)
+![Uploading IMG_3740.jpeg…]()
+
 
  Project summary
 
